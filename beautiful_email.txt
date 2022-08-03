@@ -1,0 +1,1 @@
+https://betterdatascience.com/send-emails-with-python/

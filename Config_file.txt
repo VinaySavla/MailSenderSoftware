@@ -1,0 +1,15 @@
+title=SC LEGAL
+background_color=(17, 200, 255)
+send_button_color=(0, 255, 0)
+hr_mail=learntoearn195@gmail.com
+hr_ail_pswd=zdqvmgikgvxaxlsg
+default_mail=savlavinay022@gmail.com
+mail_subject=Notification
+mail_body=Please do not share with anyone
+all_text_color=(0,0,0)
+send_button_text_color=(0, 0, 244)
+wait_time_in_sec=2
+SMTP_host=smtp.gmail.com
+smtp_port=587
+Main_Window_title=SC LEGAL
+Icon_path=123.jpg
