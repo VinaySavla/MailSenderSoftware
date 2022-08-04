@@ -128,6 +128,14 @@ class Ui_MainWindow(object):
         self.toolButton_4.setObjectName("toolButton_4")
         self.toolButton_4.clicked.connect(self.body_template_path)
         self.toolButton_4.setStyleSheet(self.all_text_color_browse)
+
+
+
+        self.toolButton_5 = QtWidgets.QToolButton(self.frame)
+        self.toolButton_5.setGeometry(QtCore.QRect(330, 390, 61, 31))
+        self.toolButton_5.setObjectName("toolButton_4")
+        self.toolButton_5.clicked.connect(self.subject_template_path)
+        self.toolButton_5.setStyleSheet(self.all_text_color_browse)
         
 
         self.pushButton_2 = QtWidgets.QPushButton(self.frame)
@@ -146,14 +154,15 @@ class Ui_MainWindow(object):
 
 
         self.label_7 = QtWidgets.QLabel(self.frame)
-        self.label_7.setGeometry(QtCore.QRect(80, 390, 101, 31))
+        self.label_7.setGeometry(QtCore.QRect(80, 390, 180, 31))
         self.label_7.setStyleSheet(self.all_text_color)
         self.label_7.setObjectName("label_7")
-        self.lineEdit = QtWidgets.QLineEdit(self.frame)
-        self.lineEdit.setGeometry(QtCore.QRect(330, 390, 171, 31))
-        self.lineEdit.setStyleSheet(self.all_text_color_browse)
-        self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setText(self.mail_subject)
+
+        # self.lineEdit = QtWidgets.QLineEdit(self.frame)
+        # self.lineEdit.setGeometry(QtCore.QRect(330, 390, 171, 31))
+        # self.lineEdit.setStyleSheet(self.all_text_color_browse)
+        # self.lineEdit.setObjectName("lineEdit")
+        # self.lineEdit.setText(self.mail_subject)
         
         self.label_8 = QtWidgets.QLabel(self.frame)
         self.label_8.setGeometry(QtCore.QRect(120, 20, 91, 61))
@@ -189,16 +198,17 @@ class Ui_MainWindow(object):
         self.toolButton_3.setText(_translate("MainWindow", "Browse"))
         self.toolButton_4.setText(_translate("MainWindow", "Browse"))
         self.toolButton_2.setText(_translate("MainWindow", "Browse"))
+        self.toolButton_5.setText(_translate("MainWindow", "Browse"))
 
         self.pushButton.setText(_translate("MainWindow", "Send"))
         self.pushButton.clicked.connect(self.Send_button)
         
-        self.label.setText(_translate("MainWindow", "Select Exel Sheet"))
+        self.label.setText(_translate("MainWindow", "Select Excel Sheet"))
         self.label_2.setText(_translate("MainWindow", "Select Output Folder"))
         # self.label_4.setText(_translate("MainWindow", "Email Notification Sender"))
         self.label_5.setText(_translate("MainWindow", "Select Attachment Template"))
 
-        self.label_7.setText(_translate("MainWindow", "Mail Subject"))
+        self.label_7.setText(_translate("MainWindow", "Select Subject Template :"))
         self.label_3.setText(_translate("MainWindow", "Select File Name"))
         self.label_6.setText(_translate("MainWindow", "Select Body Template :"))
 
@@ -225,6 +235,12 @@ class Ui_MainWindow(object):
         files, _ = QFileDialog.getOpenFileName(None, "Open File", "", "HTML File (*.html)")
         self.body_tem_file_path = str(files)
         print(self.body_tem_file_path)
+
+    def subject_template_path(self):
+        print("selecting mail body Template ")
+        files, _ = QFileDialog.getOpenFileName(None, "Open File", "", "HTML File (*.html)")
+        self.subject_tem_file_path = str(files)
+        print(self.subject_tem_file_path)
 
 
 
@@ -276,10 +292,10 @@ class Ui_MainWindow(object):
             data = "Please check the message below"
         return data
 
-    def sendMail_new(self,pdf_file_to_send,send_to,body_template_html_path):
+    def sendMail_new(self,pdf_file_to_send,send_to,body_template_html_path,mail_msg,subject_msg):
 
         # q=self.ch_var2(aaa,col_val,row_val)
-        mail_all_body_text = self.mail_Body_message_formatted(body_template_html_path)
+        
 
         sender = lines[3].strip()
         sender = sender.split("=")[1]
@@ -288,24 +304,24 @@ class Ui_MainWindow(object):
         password = password.split("=")[1]
 
         receiver = send_to
-        subj_tex=self.lineEdit.text()
+        subj_tex=subject_msg
 
         msg = EmailMessage()
         msg['Subject'] = subj_tex
         msg['From'] = sender
         msg['To'] = receiver
 
-        smtp_host =lines[11].strip()
+        smtp_host =lines[9].strip()
         smtp_host=smtp_host.split("=")[1]
        
 
-        smtp_port =lines[12].strip()
+        smtp_port =lines[10].strip()
         smtp_port=smtp_port.split("=")[1]
         smtp_port=int(smtp_port)
 
         pdfname = self.pdf_name_in_mail+".pdf"
         
-        msg.set_content(mail_all_body_text, subtype='html')
+        msg.set_content(mail_msg, subtype='html')
 
         with open(pdf_file_to_send, 'rb') as pdf:
             msg.add_attachment(pdf.read(), maintype='application', subtype='octet-stream', filename=pdfname)
@@ -366,11 +382,11 @@ class Ui_MainWindow(object):
         message.attach(payload)
 
 
-        smtp_host =lines[11].strip()
+        smtp_host =lines[9].strip()
         smtp_host=smtp_host.split("=")[1]
        
 
-        smtp_port =lines[12].strip()
+        smtp_port =lines[10].strip()
         smtp_port=smtp_port.split("=")[1]
         smtp_port=int(smtp_port)
         
@@ -399,6 +415,9 @@ class Ui_MainWindow(object):
         #     '[SALARY]' : salary,
         # }
         print(dic)
+
+        mail_all_body_text = self.mail_Body_message_formatted(self.body_tem_file_path)
+        subject_text = self.mail_Body_message_formatted(self.subject_tem_file_path)
         for p in sample_page.paragraphs:
             inline = p.runs
             for i in range(len(inline)):
@@ -407,7 +426,17 @@ class Ui_MainWindow(object):
                     if key in text:
                         text=text.replace(key,dic[key])
                         inline[i].text = text
-        return sample_page
+
+
+                        mail_all_body_text = mail_all_body_text.replace(key,dic[key])
+                        subject_text = subject_text.replace(key,dic[key])
+                        
+                        
+                        # print("abc")
+        
+
+        
+        return sample_page,mail_all_body_text,subject_text
     #end       
 
 
@@ -457,9 +486,12 @@ class Ui_MainWindow(object):
             self.Pop_up_message("Please Select Body Template")
             return
 
-
         if self.attachment_tem_file_path==None:
             self.Pop_up_message("Please Select Attachment Template")
+            return
+        
+        if self.subject_tem_file_path==None:
+            self.Pop_up_message("Please Select subject Template")
             return
 
         print("Starting to send Emails...")  
@@ -482,6 +514,10 @@ class Ui_MainWindow(object):
         if self.output_folder_path !=None: 
             print("output folder is set.")
             print(self.output_folder_path)
+
+        if self.subject_tem_file_path !=None: 
+            print("output folder is set.")
+            print(self.subject_tem_file_path)
         else:
             print("Please Select output fodler.")
             return
@@ -545,7 +581,8 @@ class Ui_MainWindow(object):
                 # the message to be emailed
                 row_value=l2
                 path1=Document(self.attachment_tem_file_path)
-                z=self.ch_var(path1,col_value,row_value)
+                z,mail_msg,subject_msg = self.ch_var(path1,col_value,row_value)
+
                 
                 # name = "output\\"+name
                 z.save(self.output_folder_path+"//"+fn+"_"+str(i+2)+'.docx')
@@ -553,7 +590,7 @@ class Ui_MainWindow(object):
                 convert(self.output_folder_path+"//"+fn+"_"+str(i+2)+".docx", filename)
                 print("pdf generation done")
 
-                self.sendMail_new(filename,send_to,self.body_tem_file_path)
+                self.sendMail_new(filename,send_to,self.body_tem_file_path,mail_msg,subject_msg)
 
                 print("Mail sent: "+user_name)        
                 print("waiting "+self.wait_time +" seconds")
@@ -590,26 +627,26 @@ if __name__ == "__main__":
     btn_color_set =  lines[2].strip()
     btn_color_set = btn_color_set.split("=")[1]
 
-    mail_subject=lines[6].strip()
-    mail_subject = mail_subject.split("=")[1]
+    mail_subject=''
+    mail_subject = ''
 
-    mail_body=lines[7].strip()
-    mail_body=mail_body.split("=")[1]
+    mail_body=''
+    mail_body=''
 
 
-    all_text_color=lines[8].strip()
+    all_text_color=lines[6].strip()
     all_text_color=all_text_color.split("=")[1]
 
-    send_button_text_color=lines[9].strip()
+    send_button_text_color=lines[7].strip()
     send_button_text_color=send_button_text_color.split("=")[1]
 
-    main_window_title=lines[13].strip()
+    main_window_title=lines[11].strip()
     main_window_title=main_window_title.split("=")[1]
 
-    main_icon=lines[14].strip()
+    main_icon=lines[12].strip()
     main_icon=main_icon.split("=")[1]
 
-    wait_time_in_sec=lines[10].strip()
+    wait_time_in_sec=lines[8].strip()
     wait_time_in_sec=wait_time_in_sec.split("=")[1]
     myLabel= QLabel()
     myLabel.setAutoFillBackground(True) # This is important!!
